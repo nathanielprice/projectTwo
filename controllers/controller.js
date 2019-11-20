@@ -26,15 +26,16 @@ module.exports = function(app){
         })
     
 
-    app.get("/api/standings", function(req,res){
-        db.standings.findAll({
-            order: [["points", "DESC"]]
-        }).then(function(results){
-            res.json(results);
-        })
-    })
+    // app.get("/api/standings", function(req,res){
+    //     db.standings.findAll({
+    //         order: [["points", "DESC"]]
+    //     }).then(function(results){
+    //         res.json(results);
+    //     })
+    // })
 
     app.get("/standings", function (req, res){
+        jobs.options();
         res.render(path.join(__dirname, "../views/layouts/standings.pug"));
     })
     
@@ -44,7 +45,7 @@ module.exports = function(app){
 
     //APIs so that user can pick games of the week
     app.get("/pickGames", function(req, res){
-        jobs.options();
+        // jobs.options();
         res.render(path.join(__dirname, "../views/layouts/pickGames.pug"));
     })
 
@@ -69,8 +70,20 @@ module.exports = function(app){
     });
     //APIs used to calculate points
     app.get('/api/getPicks', function(req, res){
-        jobs.options();
+        // jobs.options();
         db.picks.findAll()
+        .then(function(results){
+            res.json(results);
+        })
+    })
+
+    //API to check if individual has picked
+    app.get('/api/getPicks/:user', function(req,res){
+        db.picks.findAll({
+            where: {
+                user: req.params.user
+            }
+        })
         .then(function(results){
             res.json(results);
         })
@@ -160,10 +173,7 @@ module.exports = function(app){
             res.json(result);
         });
 
-        db.standings.create({
-            name: req.body.name,
-            points: 0,           
-        })
+
     });
 
 }
